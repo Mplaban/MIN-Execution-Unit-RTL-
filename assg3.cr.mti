@@ -1,0 +1,16 @@
+{D:/BITS/2nd sem ME/VLSI Arch/assg3/main.v} {2 {vlog -work work -vopt -stats=none {D:/BITS/2nd sem ME/VLSI Arch/assg3/main.v}
+QuestaSim-64 vlog 2021.1 Compiler 2021.01 Jan 19 2021
+-- Compiling module main
+** Warning: D:/BITS/2nd sem ME/VLSI Arch/assg3/main.v(118): (vlog-2256) Event expressions should result in a singular type.
+
+Top level modules:
+	main
+
+} {} {}} {D:/BITS/2nd sem ME/VLSI Arch/assg3/tesbench.v} {1 {vlog -work work -vopt -stats=none {D:/BITS/2nd sem ME/VLSI Arch/assg3/tesbench.v}
+QuestaSim-64 vlog 2021.1 Compiler 2021.01 Jan 19 2021
+-- Compiling module testbench
+
+Top level modules:
+	testbench
+
+} {} {}}

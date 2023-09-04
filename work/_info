@@ -1,0 +1,122 @@
+m255
+K4
+z2
+Z0 !s99 nomlopt
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+R0
+!s11f vlog 2021.1 2021.01, Jan 19 2021
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z1 dD:/BITS/2nd sem ME/VLSI Arch/assg3
+T_opt
+!s110 1682403432
+VW5e`ZJ[8TPe4UL0WF=W3D2
+Z2 04 9 4 work testbench fast 0
+=13-9829a6363a91-64477067-22e-4e14
+Z3 !s124 OEM100
+o-quiet -auto_acc_if_foreign -work work +acc
+Z4 tCvgOpt 0
+n@_opt
+Z5 OL;O;2021.1;73
+T_opt1
+!s110 1682313858
+Vf=NC^NFUFg:EM406bA>HT1
+R2
+=1-9829a6363a91-64461281-312-2254
+R3
+o-quiet -auto_acc_if_foreign -work work -debugdb
+R4
+n@_opt1
+R5
+R1
+vmain
+!s110 1682403427
+!i10b 1
+!s100 9l`OFj`X4[@5SM9Y?0;;i2
+IbkfZ[P[B3F2:9:7^V9P^O3
+R1
+w1682402738
+8D:/BITS/2nd sem ME/VLSI Arch/assg3/main.v
+FD:/BITS/2nd sem ME/VLSI Arch/assg3/main.v
+!i122 130
+L0 1 326
+Z6 VDg1SIo80bB@j0V0VzS_@n1
+Z7 OL;L;2021.1;73
+r1
+!s85 0
+31
+Z8 !s108 1682403427.000000
+!s107 D:/BITS/2nd sem ME/VLSI Arch/assg3/main.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/BITS/2nd sem ME/VLSI Arch/assg3/main.v|
+!i113 0
+Z9 o-work work -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R4
+vtestbench
+!s110 1682403428
+!i10b 1
+!s100 eB14XKT<hAJeb8S5M1_Gz1
+In4_7z9TmMQiIK[90HNDZW3
+R1
+w1682403423
+8D:/BITS/2nd sem ME/VLSI Arch/assg3/tesbench.v
+FD:/BITS/2nd sem ME/VLSI Arch/assg3/tesbench.v
+!i122 131
+L0 1 70
+R6
+R7
+r1
+!s85 0
+31
+R8
+!s107 D:/BITS/2nd sem ME/VLSI Arch/assg3/tesbench.v|
+!s90 -reportprogress|300|-work|work|-vopt|-stats=none|D:/BITS/2nd sem ME/VLSI Arch/assg3/tesbench.v|
+!i113 0
+R9
+R4

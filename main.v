@@ -1,0 +1,326 @@
+module main(clk,pc_in,ire_in,mem1_in,mem2_in,mem3_in,pc,ire,t1,t2,rx,ry,a,b,di,do,irf,reset,cntrl_wrd,ao,r0,r1,r2,z,v,n,c);
+
+
+input clk,reset;
+input [15:0] r0, r1,r2;
+input [15:0] pc_in,ire_in,mem1_in,mem2_in,mem3_in;
+
+output reg signed [15:0] pc;
+output reg signed [15:0] ire;
+output reg signed [15:0] irf;
+output reg signed [15:0] t1;
+output reg signed [15:0] t2;
+output reg signed [15:0] rx;
+output reg signed [15:0] ry;
+output reg signed [15:0] di;
+output reg signed [15:0] do;
+output reg signed [15:0] ao;
+output reg z;
+output reg v;
+output reg n;
+output reg c;
+
+reg signed [15:0] edb;
+reg signed [15:0] aluout;
+reg signed [15:0] regfile [15:0];
+
+
+
+output reg signed [15:0] a;
+output reg signed [15:0] b;
+reg [2:0] op_code;
+
+wire [5:0] oprn;
+wire [3:0] rx_i;
+wire [1:0] mode;
+wire [3:0] ry_i;
+
+wire [2:0] a_src;
+wire [1:0] a_dest;
+wire [2:0] b_src;
+wire [2:0] b_dest;
+wire [2:0] alu_fnc;
+wire [2:0] ext_memop;
+wire ire_irf;
+
+output reg [17:0] cntrl_wrd;
+
+reg [16:0] mem[31:0];
+
+assign oprn = ire[15:10];
+assign rx_i = ire[9:6];
+assign mode = ire[5:4] ;
+assign ry_i =  ire[3:0];
+
+assign a_src  = cntrl_wrd[17:15] ;
+assign a_dest = cntrl_wrd[14:13] ;
+assign b_src  = cntrl_wrd [12:10] ;
+assign b_dest = cntrl_wrd [9:7] ;
+assign alu_fnc= cntrl_wrd [6:4] ;
+assign ext_memop=cntrl_wrd[3:1] ;
+assign ire_irf = cntrl_wrd[0] ;
+
+reg [6:0] present_state,next_state,IB,SB;
+
+parameter oprr1=0,oprr2=1,abdm1=2,abdm2=3,abdm3=4,abdm4=5,adrm1=6,ldrm1=7,ldrm2=8,strm1=9,test1=10,oprm1=11,oprm2=12,
+	  brzz1=13,brzz2=14,brzz3=15,bc=16,rr=17;
+
+always@(rx,ry)
+begin
+regfile[rx_i] <=rx;
+regfile[ry_i] <=ry;
+end
+
+always@(ire_irf,irf)
+begin
+if(ire_irf==1)
+ire<=irf;
+end
+
+always@(ire,mode,oprn)
+begin
+rx= regfile[rx_i];
+ry= regfile[ry_i];
+
+if(mode==2'b10)
+IB=abdm1;
+else if(mode==2'b01)
+IB=adrm1;
+else if(mode==2'b00)
+IB=rr;
+
+if(oprn==6'b000001)
+SB=ldrm1;
+else if(oprn==6'b000010)
+SB=strm1;
+else if(oprn==6'b000011)
+SB=test1;
+else if(oprn==6'bxxx100 && IB==rr)
+SB=oprr1;
+else if(oprn==6'bxxx100 && IB!=rr)
+SB=oprm1;
+else if(oprn==6'b000101)
+SB=brzz1;
+end
+
+always@(oprn)
+begin
+if(oprn==6'b001100)
+op_code=001;
+else if(oprn==6'b010100)
+op_code=010;
+else if(oprn==6'b011100)
+op_code=011;
+else
+op_code=000;
+end
+
+always@(cntrl_wrd,pc,t1,t2,rx,ry,ire,regfile,irf)
+begin
+
+case(present_state)
+
+oprr1: next_state=oprr2;
+oprr2: next_state=brzz2;
+
+abdm1: next_state=abdm2;
+abdm2: next_state=abdm3;
+abdm3: next_state=abdm4;
+abdm4: next_state=SB;
+
+adrm1: next_state=SB;
+ldrm1: next_state=ldrm2;
+ldrm2: next_state=IB;
+
+strm1: next_state=ldrm2;
+
+test1: next_state=ldrm2;
+
+oprm1: next_state=oprm2;
+oprm2: next_state=brzz3;
+
+brzz1: next_state=bc;
+bc: if(z==0)
+	next_state=brzz3;
+    else if(z==1)
+	next_state=brzz2;
+brzz2: next_state=IB;
+brzz3: next_state=brzz2;
+	
+
+
+default: if(IB!=rr) 
+	next_state=IB;
+	else
+	next_state=SB;
+endcase
+
+end
+
+always@(posedge clk)
+begin
+if(reset==1)
+begin
+z=0;
+v=0;
+c=0;
+n=0;
+irf=0;
+t1=0;
+t2=0;
+di=0;
+do=0;
+ao=0;
+aluout=0;
+cntrl_wrd=0;
+pc=pc_in;
+ire=ire_in;
+mem[0]=mem1_in;
+mem[1]=mem2_in;
+mem[6]=mem3_in;
+regfile[0]= r0;
+regfile[1]= r1;
+regfile[2]= r2;
+end
+else
+present_state<=next_state;
+end
+
+always@(present_state)
+begin
+case(present_state)
+oprr1: cntrl_wrd <= 18'b001000100001100000;
+oprr2: cntrl_wrd <= 18'b011001010100010100;
+
+abdm1: cntrl_wrd <= 18'b011000000000010010;
+abdm2: cntrl_wrd <= 18'b101110000000000000;
+abdm3: cntrl_wrd <= 18'b010001110000100000;
+abdm4: cntrl_wrd <= 18'b101010000000000010;
+adrm1: cntrl_wrd <= 18'b000000101000001010;
+
+ldrm1: cntrl_wrd <= 18'b011001111010010100;
+ldrm2: cntrl_wrd <= 18'b110001010111000001;
+
+strm1: cntrl_wrd <= 18'b001001100001001110;
+
+test1: cntrl_wrd <= 18'b011001111000010100;
+
+oprm1: cntrl_wrd <= 18'b001001110001100000;
+oprm2: cntrl_wrd <= 18'b101001100000001110;
+
+brzz1: cntrl_wrd <= 18'b010000000000010100;
+brzz2: cntrl_wrd <= 18'b000001010110000001;
+brzz3: cntrl_wrd <= 18'b011000000000010100;
+endcase
+end
+
+always@(a_src,a_dest,pc,t1,ry,t2,rx,a)
+begin
+case(a_src)
+3'b011: a<=pc;
+3'b101: a<=t1;
+3'b010: a<=ry;
+3'b110: a<=t2;
+3'b001: a<=rx;
+3'b000: a<=z;
+endcase
+
+case(a_dest)
+2'b11: pc<=a;
+2'b01: t2<=a;
+2'b10: ry<=a;
+endcase
+end
+
+always@(b_src,b_dest,di,ry,t1,t2,rx,b)
+begin
+case(b_src)
+3'b111: b<=di;
+3'b010: b<=ry;
+3'b101: b<=t1;
+3'b110: b<=t2;
+3'b001: b<=rx;
+3'b000: b<=z;
+endcase
+
+case(b_dest)
+3'b100: t2<=b;
+3'b011: pc<=b;
+3'b101: begin
+	rx<=b;
+	t2<=b;
+	end
+3'b110: begin
+	ry<=b;
+	t2<=b;
+	end
+3'b010: ry<=b;
+3'b001: rx<=b;
+endcase
+end
+
+always@(alu_fnc,a,b)
+begin
+case(alu_fnc)
+3'b001: aluout<= a+1;
+3'b010: aluout<= a+b;
+3'b110: begin
+	if(op_code==001)
+	{v,aluout}<= a + b;
+	else if(op_code==010)
+	{c,aluout}<= a - b;
+	else if(op_code==011)
+	aluout<= a & b;
+	
+	if(aluout==0)
+	z=1;
+	else
+	z=0;
+	
+	if(aluout<0)
+	n=1;
+	else
+	n=0;
+
+	end	
+3'b100: aluout<= a+ 0;
+3'b011: aluout<= a-1;
+3'b000: a=a+0;
+endcase
+end
+
+always@(posedge clk)
+begin
+t1<=aluout;
+end
+
+
+always@(ext_memop,a,b,ao)
+begin
+case(ext_memop)
+3'b001: begin
+	ao=a;
+	edb=mem[ao];
+	di=edb;
+	end
+3'b010:
+begin
+	ao=a;
+	edb=mem[ao];
+	irf=edb;
+end
+3'b101:
+begin
+	ao=b;
+	edb=mem[ao];
+	di=edb;
+end
+3'b111:
+begin
+	ao=b;
+	do=a;
+	mem[ao]=do;
+end
+endcase
+end
+endmodule
